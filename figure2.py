@@ -1,18 +1,18 @@
-import matplotlib.pyplot as plt
-from matplotlib.axes import Axes
 import matplotlib.colors as mcolors
+import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.axes import Axes
 
+from analysis.plotting import (
+    plot_fill_between,
+    plot_read_sweep,
+)
 from analysis.utils import (
     CMAP,
     get_channel_temperature,
     get_enable_read_current,
     get_enable_write_current,
     import_directory,
-)
-from analysis.plotting import (
-    plot_read_sweep,
-    plot_fill_between,
 )
 
 READ_XMIN = 400

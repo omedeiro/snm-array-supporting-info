@@ -1,15 +1,12 @@
-import numpy as np
-import os
-import scipy.io as sio
-from matplotlib.pyplot import Axes
-import matplotlib.pyplot as plt
-from matplotlib.ticker import MultipleLocator
-from typing import Tuple, Literal
 import collections
-from matplotlib.collections import PolyCollection
-import matplotlib.colors as mcolors
+import os
+from typing import Literal, Tuple
+
 import ltspice
-from matplotlib.colors import LogNorm
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.io as sio
+
 from cells import CELLS
 
 SUBSTRATE_TEMP = 1.3
@@ -287,28 +284,6 @@ def get_channel_temperature(
         CRITICAL_TEMP, SUBSTRATE_TEMP, enable_current, max_enable_current
     )
     return channel_temp
-
-
-def calculate_channel_temperature(
-    critical_temperature: float,
-    substrate_temperature: float,
-    ih: float,
-    ih_max: float,
-) -> float:
-    N = 2.0
-    beta = 1.25
-    if ih_max == 0:
-        raise ValueError("ih_max cannot be zero to avoid division by zero.")
-
-    channel_temperature = (critical_temperature**4 - substrate_temperature**4) * (
-        (ih / ih_max) ** N
-    ) + substrate_temperature**4
-
-    channel_temperature = np.maximum(channel_temperature, 0)
-
-    temp_channel = np.power(channel_temperature, 0.25).astype(float)
-    return temp_channel
-
 
 
 def safe_max(arr: np.ndarray, mask: np.ndarray) -> float:

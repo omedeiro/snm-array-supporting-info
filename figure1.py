@@ -1,13 +1,12 @@
+
 import matplotlib.pyplot as plt
-from matplotlib.axes import Axes
-import os
+
+from analysis.plotting import (
+    plot_voltage_hist,
+    plot_voltage_trace_averaged,
+)
 from analysis.utils import (
     import_directory,
-    get_bit_error_rate,
-)
-from analysis.plotting import (
-    plot_voltage_trace_averaged,
-    plot_voltage_hist,
 )
 
 
@@ -54,7 +53,7 @@ def plot_figure1_waveforms():
     ax3.set_ylabel("[mV]")
     ax_dict["B"].set_xlabel("Time [$\mu$s]")
 
-    # Handle legends (combine or separate)
+    # Handle legends
     ax_dict["A"].legend(loc="upper left")
     ax2.legend(loc="upper right")
     ax_dict["B"].legend(loc="upper left")

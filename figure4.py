@@ -1,12 +1,22 @@
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
-import os
+from matplotlib import ticker
+
+from analysis.plotting import (
+    plot_enable_write_sweep_multiple,
+    plot_parameter_array,
+    plot_write_sweep,
+)
 from analysis.utils import (
+    convert_cell_to_coordinates,
     get_bit_error_rate,
     get_bit_error_rate_args,
     get_channel_temperature,
     get_channel_temperature_sweep,
     get_critical_current_heater_off,
+    get_enable_current_sweep,
     get_enable_write_current,
     get_read_current,
     get_read_currents,
@@ -14,17 +24,8 @@ from analysis.utils import (
     import_directory,
     initialize_dict,
     process_cell,
-    convert_cell_to_coordinates,
-    get_enable_current_sweep,
-)
-from analysis.plotting import (
-    plot_enable_write_sweep_multiple,
-    plot_write_sweep,
-    plot_parameter_array,
 )
 from cells import CELLS
-from matplotlib import cm
-from matplotlib import ticker
 
 C0 = "#1b9e77"
 C1 = "#d95f02"

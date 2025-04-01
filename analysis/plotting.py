@@ -1,38 +1,33 @@
+import os
 from typing import Literal
 
-import ltspice
+import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
 import numpy as np
-import os
-import matplotlib.font_manager as fm
-from matplotlib.axes import Axes
-import matplotlib.pyplot as plt
 from cycler import cycler
-import scipy.io as sio
+from matplotlib import colors as mcolors
+from matplotlib.axes import Axes
 from matplotlib.collections import PolyCollection
 from matplotlib.colors import LogNorm
 from matplotlib.ticker import MultipleLocator
-from matplotlib import colors as mcolors
+
 from analysis.utils import (
-    import_directory,
-    filter_first,
-    process_read_data,
-    get_step_parameter,
-    get_read_currents,
-    get_write_current,
-    get_enable_write_current,
-    get_enable_read_current,
-    get_read_width,
-    get_write_width,
-    get_enable_current_sweep,
-    get_bit_error_rate,
-    get_voltage_trace_data,
-    get_channel_temperature,
     build_array,
-    polygon_nominal,
+    get_bit_error_rate,
+    get_channel_temperature,
+    get_enable_current_sweep,
+    get_enable_read_current,
+    get_enable_write_current,
+    get_read_currents,
+    get_read_width,
+    get_step_parameter,
+    get_voltage_trace_data,
+    get_write_current,
+    get_write_width,
     polygon_inverting,
-    
+    polygon_nominal,
 )
+
 READ_XMIN = 400
 READ_XMAX = 1000
 IC0_C3 = 910
@@ -64,11 +59,8 @@ plt.rcParams.update(
         "lines.linewidth": 1.5,
         "legend.fontsize": 5,
         "legend.frameon": False,
-        "axes.linewidth": 0.5,  # Thin axis lines
         "xtick.major.size": 3,
         "ytick.major.size": 3,
-        "xtick.major.width": 0.5,
-        "ytick.major.width": 0.5,
         "xtick.minor.size": 2,
         "ytick.minor.size": 2,
         "xtick.minor.width": 0.4,
@@ -667,7 +659,7 @@ def plot_case(ax, data_dict, case, signal_name="left", color=None):
         ax,
         data_dict,
         cases=[case],
-        signal_name=f"tran_left_branch_current",
+        signal_name="tran_left_branch_current",
         color="C0",
         label="Left Branch Current",
     )
@@ -675,7 +667,7 @@ def plot_case(ax, data_dict, case, signal_name="left", color=None):
         ax,
         data_dict,
         cases=[case],
-        signal_name=f"tran_right_branch_current",
+        signal_name="tran_right_branch_current",
         color="C1",
         label="Right Branch Current",
     )

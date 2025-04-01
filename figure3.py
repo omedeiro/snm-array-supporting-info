@@ -1,21 +1,23 @@
+import os
+
 import ltspice
 import numpy as np
-import os
 from matplotlib import pyplot as plt
-from analysis.utils import (
-    CMAP,
-    import_directory,
-    filter_first,
-    process_read_data,
-)
 
 from analysis.plotting import (
     create_plot,
-    plot_current_sweep_switching,
     plot_current_sweep_ber,
+    plot_current_sweep_switching,
     plot_read_sweep_array,
     plot_read_switch_probability_array,
 )
+from analysis.utils import (
+    CMAP,
+    filter_first,
+    import_directory,
+    process_read_data,
+)
+
 if __name__ == "__main__":
 
     # get raw files
