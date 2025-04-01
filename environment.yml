@@ -1,0 +1,12 @@
+name: snm-array-supporting
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pip
+  - pip:
+    - numpy
+    - scipy
+    - matplotlib
+    - ipykernel
+    - ltspice

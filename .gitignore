@@ -1,0 +1,5 @@
+*.pyc
+*.ruff_cache
+*.pdm-build
+__pycache__/
+*:Zone.Identifier

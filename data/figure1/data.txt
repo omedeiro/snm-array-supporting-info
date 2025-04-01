@@ -1,0 +1,5 @@
+00_SPG806_20241114_nMem_parameter_sweep_D6_A4_B4_2024-11-14 11-47-10.mat
+01_SPG806_20241114_nMem_parameter_sweep_D6_A4_B4_2024-11-14 12-01-12.mat
+02_SPG806_20241114_nMem_parameter_sweep_D6_A4_B4_2024-11-14 12-13-23.mat
+03_SPG806_20241114_nMem_parameter_sweep_D6_A4_B4_2024-11-14 12-27-15.mat
+04_SPG806_20241119_nMem_parameter_sweep_D6_A4_B4_2024-11-19 10-14-54.mat

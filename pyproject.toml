@@ -1,0 +1,52 @@
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+
+[project]
+name = "snm-array-supporting"
+version = "0.0.1"
+
+
+authors = [
+  { name="O. Medeiros", email="omedeiro@mit.edu" },
+]
+maintainers = [
+  { name="O. Medeiros", email="omedeiro@mit.edu" },
+]
+description = "code related Scalable Superconducting Nanowire Memory Array with Row-Column Addressing"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {file = "LICENSE.txt"}
+keywords = ["nanowire_electronics", "instrument control"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering"
+]
+
+
+[tool.ruff]
+line-length = 88
+output-format = "concise"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+ignore = ["F841", "E731", "E501"]
+extend-select = ["I"]
+fixable = ["ALL"]
+unfixable = []
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = false
+docstring-code-line-length = "dynamic"
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
