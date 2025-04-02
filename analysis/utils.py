@@ -140,7 +140,10 @@ def get_read_current(data_dict: dict) -> float:
 def get_fitting_points(
     x: np.ndarray, y: np.ndarray, ztotal: np.ndarray
 ) -> Tuple[np.ndarray, np.ndarray]:
-    mid_idx = np.where(ztotal > np.nanmax(ztotal, axis=0) / 2)
+    with np.errstate(invalid='ignore'):  # Suppress warnings for NaN comparisons
+        valid_mask = ~np.isnan(ztotal)
+        ztotal_filtered = np.where(valid_mask, ztotal, -np.inf)  # Replace NaNs with -inf for comparison
+        mid_idx = np.where(ztotal_filtered > np.nanmax(ztotal_filtered, axis=0) / 2)
     xfit, xfit_idx = np.unique(x[mid_idx[1]], return_index=True)
     yfit = y[mid_idx[0]][xfit_idx]
     return xfit, yfit

@@ -26,12 +26,14 @@ apply_snm_style()
 if __name__ == "__main__":
 
     # Get and parse raw files
-    files = [f for f in os.listdir("data/figure3/") if f.endswith(".raw")]
+    files = [
+        f for f in os.listdir("data/figure3/read_current_sweep/") if f.endswith(".raw")
+    ]
     parsed_data = {}
     write_current_list = []
 
     for file in files:
-        data = ltspice.Ltspice(f"data/figure3/{file}").parse()
+        data = ltspice.Ltspice(f"data/figure3/read_current_sweep/{file}").parse()
         ltsp_data_dict = process_read_data(data)
         parsed_data[file] = ltsp_data_dict
         write_current = ltsp_data_dict[0]["write_current"][0] * 1e6
@@ -88,9 +90,7 @@ if __name__ == "__main__":
     ]
     selected_handles = [handles[labels.index(lbl)] for lbl in selected_labels]
 
-    dict_list = import_directory(
-        "/home/omedeiro/nmem/src/nmem/analysis/read_current_sweep_write_current2/write_current_sweep_C3"
-    )[::2]
+    dict_list = import_directory("data/figure3/write_current_sweep")[::2]
     write_current_list = [
         filter_first(data_dict["write_current"]) * 1e6 for data_dict in dict_list
     ]

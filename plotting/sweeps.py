@@ -84,7 +84,7 @@ def plot_read_sweep(
 
     # Add error bars if required
     if show_errorbar:
-        add_ber_error_band(ax, read_currents, value, data_dict, **kwargs)
+        add_ber_error_band(ax, read_currents, value)
     # Set axis limits and ticks
     
     return ax
@@ -93,13 +93,14 @@ def plot_read_sweep(
 def plot_enable_write_sweep_multiple(
     ax: Axes,
     dict_list: list[dict],
-    show_errorbar: bool = False,
-    N: int = None,
     show_colorbar: bool = True,
+    show_errorbar: bool = False,
+    range: slice = None,
 ) -> Axes:
-    if N is None:
-        N = len(dict_list)
+    if range is not None:
+        dict_list = dict_list[range]
     write_current_list = []
+
     for data_dict in dict_list:
         write_current = get_write_current(data_dict)
         write_current_list.append(write_current)
@@ -107,14 +108,14 @@ def plot_enable_write_sweep_multiple(
     for i, data_dict in enumerate(dict_list):
         write_current_norm = write_current_list[i] / 100
         plot_enable_sweep_single(
-            ax, data_dict, color=CMAP(write_current_norm), show_errorbar=show_errorbar
+            ax, data_dict, show_errorbar=show_errorbar, color=CMAP(write_current_norm)
         )
 
     if show_colorbar:
         add_colorbar(
             ax,
             write_current_list,
-            label="Enable Write Current [$\mu$A]",
+            label="Write Current [$\mu$A]",
             cmap=CMAP,
         )
 
@@ -123,7 +124,6 @@ def plot_enable_write_sweep_multiple(
             ax,
             write_current_list,
             get_bit_error_rate(dict_list[0]),
-            dict_list[0],
             color="black",
         )
 
@@ -151,8 +151,6 @@ def plot_enable_sweep_single(
             ax,
             enable_currents,
             bit_error_rate,
-            data_dict,
-            **kwargs,
         )
     set_ber_ticks(ax)
 
@@ -287,7 +285,7 @@ def plot_enable_read_sweep(ax: plt.Axes, dict_list, **kwargs):
 
 
 
-def plot_write_sweep(ax: Axes, dict_list: str) -> Axes:
+def plot_write_sweep(ax: Axes, dict_list: str, show_colorbar:bool=False) -> Axes:
     colors = CMAP(np.linspace(0.1, 1, len(dict_list)))
     write_temp_list = []
     enable_write_current_list = []
@@ -301,18 +299,17 @@ def plot_write_sweep(ax: Axes, dict_list: str) -> Axes:
             y,
             ztotal,
             label=f"$T_{{W}}$ = {write_temp:.2f} K, $I_{{EW}}$ = {enable_write_current:.2f} $\mu$A",
-            color=colors[dict_list.index(data_dict)],
+            color=colors[i],
             marker=".",
         )
-    ax.set_ylim([0, 1])
-    ax.yaxis.set_major_locator(MultipleLocator(0.5))
-    norm = mcolors.Normalize(
-        vmin=min(enable_write_current_list), vmax=max(enable_write_current_list)
-    )
-    sm = plt.cm.ScalarMappable(cmap=CMAP, norm=norm)
-    sm.set_array([])
-    cbar = plt.colorbar(sm, ax=ax, orientation="vertical", fraction=0.05, pad=0.05)
-    cbar.set_label("Enable Write Current [$\mu$A]")
+    set_ber_ticks(ax)
+    if show_colorbar:
+        add_colorbar(
+            ax,
+            write_temp_list,
+            label="Enable Write Current [$\mu$A]",
+            cmap=CMAP3,
+        )
     return ax
 
 
@@ -460,7 +457,6 @@ def plot_grid(axs: Axes, dict_list: list[dict]) -> Axes:
             yerr=y_step_size* np.ones_like(yfit),
             fmt="o",
             color=colors[column],
-            marker=markers[row],
             markeredgecolor="k",
             markeredgewidth=0.1,
             markersize=5,
@@ -483,7 +479,6 @@ def plot_grid(axs: Axes, dict_list: list[dict]) -> Axes:
     axs[-1, 0].set_xlabel("Enable Current ($\mu$A)")
     axs[-1, 0].set_ylabel("Critical Current ($\mu$A)")
     return axs
-
 
 
 

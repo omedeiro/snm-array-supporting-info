@@ -2,85 +2,57 @@ import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes
+from matplotlib.ticker import Locator
+from typing import List, Optional, Tuple, Callable
 
-from plotting.helpers import (
-    plot_fill_between,
-)
+from plotting.helpers import plot_fill_between_array, set_ber_ticks
 from analysis.utils import (
     get_channel_temperature,
     get_enable_read_current,
     get_enable_write_current,
     import_directory,
 )
-from plotting.sweeps import (
-    plot_read_sweep,
-)
+from plotting.sweeps import plot_read_sweep
 from plotting.style import CMAP
 
-READ_XMIN = 400
-READ_XMAX = 1000
-IC0_C3 = 910
+READ_XMIN: int = 400
+READ_XMAX: int = 1000
+IC0_C3: int = 910
 
 
-def plot_enable_write_sweep(ax: plt.Axes, dict_list: list[dict], **kwargs):
-    colors = CMAP(np.linspace(0, 1, len(dict_list)))
-
-    for j, data_dict in enumerate(dict_list):
-        plot_read_sweep(
-            ax, data_dict, "bit_error_rate", "enable_write_current", color=colors[j], **kwargs
-        )
-        plot_fill_between(ax, data_dict, fill_color=colors[j])
-
-    ax.set_xlabel("$I_{\mathrm{read}}$ [$\mu$A]")
-    ax.set_ylabel("BER")
-    ax.xaxis.set_major_locator(plt.MaxNLocator(5))
-    ax.set_xlim(READ_XMIN, READ_XMAX)
-    ax.xaxis.set_major_locator(plt.MultipleLocator(100))
-    return ax
-
-
-def plot_enable_write_temp(ax: plt.Axes, enable_write_currents, write_temperatures, colors=None):
-    colors = CMAP(np.linspace(0, 1, len(enable_write_currents)))
-    ax.plot(
-        enable_write_currents,
-        write_temperatures,
-        marker="o",
-        color="black",
-    )
-    for i, idx in enumerate([0, 3, -6, -1]):
-        ax.plot(
-            enable_write_currents[idx],
-            write_temperatures[idx],
-            marker="o",
-            markersize=6,
-            markeredgecolor="black",
-            markerfacecolor=colors[idx],
-            markeredgewidth=0.2,
-        )
-    ax.set_xlabel("$I_{\mathrm{enable}}$ [$\mu$A]")
-    ax.set_ylabel("$T_{\mathrm{write}}$ [K]")
-    ax.yaxis.set_major_locator(plt.MultipleLocator(0.2))
-    return ax
-
-
-def plot_fill_between_array(ax: Axes, dict_list: list[dict]) -> Axes:
-    colors = CMAP(np.linspace(0.1, 1, len(dict_list)))
-    for i, data_dict in enumerate(dict_list):
-        plot_fill_between(ax, data_dict, colors[i])
-    return ax
-
-
-def plot_read_sweep_array(
+def configure_axis(
     ax: Axes,
-    dict_list: list[dict],
+    xlabel: str,
+    ylabel: str,
+    xlim: Optional[Tuple[float, float]] = None,
+    ylim: Optional[Tuple[float, float]] = None,
+    xlocator: Optional[Locator] = None,
+    ylocator: Optional[Locator] = None,
+) -> Axes:
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    if xlim:
+        ax.set_xlim(xlim)
+    if ylim:
+        ax.set_ylim(ylim)
+    if xlocator:
+        ax.xaxis.set_major_locator(xlocator)
+    if ylocator:
+        ax.yaxis.set_major_locator(ylocator)
+    return ax
+
+
+def plot_sweep(
+    ax: Axes,
+    dict_list: List[dict],
     value_name: str,
     variable_name: str,
-    colorbar=None,
-    add_errorbar=False,
+    colorbar_label: Optional[str] = None,
     **kwargs,
 ) -> Axes:
     colors = CMAP(np.linspace(0, 1, len(dict_list)))
-    variable_list = []
+    variable_list: List[float] = []
+
     for i, data_dict in enumerate(dict_list):
         plot_read_sweep(
             ax,
@@ -88,108 +60,107 @@ def plot_read_sweep_array(
             value_name,
             variable_name,
             color=colors[i],
-            add_errorbar=add_errorbar,
             **kwargs,
         )
         variable_list.append(data_dict[variable_name].flatten()[0] * 1e6)
 
-    if colorbar is not None:
-        norm = mcolors.Normalize(
-            vmin=min(variable_list), vmax=max(variable_list)
-        )  # Normalize for colormap
+    if colorbar_label:
+        norm = mcolors.Normalize(vmin=min(variable_list), vmax=max(variable_list))
         sm = plt.cm.ScalarMappable(cmap=CMAP, norm=norm)
         sm.set_array([])
         cbar = plt.colorbar(sm, ax=ax, orientation="vertical", fraction=0.05, pad=0.05)
-        cbar.set_label("Write Current [$\mu$A]")
+        cbar.set_label(colorbar_label)
 
     return ax
 
 
+def plot_temperature(
+    ax: Axes,
+    currents: List[float],
+    temperatures: List[float],
+    colors: Optional[np.ndarray] = None,
+    marker_size: int = 5,
+) -> Axes:
+    colors = CMAP(np.linspace(0, 1, len(currents)))
+    ax.plot(currents, temperatures, marker="o", color="black", markersize=4)
 
-def plot_enable_read_sweep(ax: plt.Axes, dict_list, **kwargs):
-    plot_read_sweep_array(ax, dict_list, "bit_error_rate", "enable_read_current", **kwargs)
-    plot_fill_between_array(ax, dict_list)
-    ax.axvline(IC0_C3, color="black", linestyle="--")
-    ax.set_xlabel("$I_{\mathrm{read}}$ [$\mu$A]")
-    ax.set_ylabel("BER")
-    ax.set_xlim(READ_XMIN, READ_XMAX)
-    return ax
-
-
-def plot_enable_read_temp(ax: plt.Axes, enable_read_currents, read_temperatures):
-    colors = CMAP(np.linspace(0, 1, len(enable_read_currents)))
-    ax.plot(
-        enable_read_currents,
-        read_temperatures,
-        marker="o",
-        color="black",
-        markersize=4,
-    )
-    enable_read_currents = enable_read_currents[::-1]
-    read_temperatures = read_temperatures[::-1]
-    for i in range(len(read_temperatures)):
+    for i, (current, temp) in enumerate(zip(currents, temperatures)):
         ax.plot(
-            enable_read_currents[i],
-            read_temperatures[i],
+            current,
+            temp,
             marker="o",
-            markersize=5,
+            markersize=marker_size,
             markeredgecolor="black",
             markerfacecolor=colors[i],
             markeredgewidth=0.2,
         )
+    return ax
 
-    ax.set_xlabel("$I_{\mathrm{enable}}$ [$\mu$A]")
-    ax.set_ylabel("$T_{\mathrm{read}}$ [K]")
-    ax.yaxis.set_major_locator(plt.MultipleLocator(0.2))
+
+def preprocess_data(
+    dict_list: List[dict],
+    current_func: Callable[[dict], float],
+    temp_func: Callable[[dict, str], float],
+    temp_key: str,
+) -> Tuple[List[float], List[float]]:
+    currents: List[float] = []
+    temperatures: List[float] = []
+
+    for data_dict in dict_list:
+        current = current_func(data_dict)
+        temperature = temp_func(data_dict, temp_key)
+        currents.append(current)
+        temperatures.append(temperature)
+
+    return currents, temperatures
 
 
 if __name__ == "__main__":
-    # Import
-    data = import_directory("data")
-    enable_read_290_list = import_directory("data/figure2/data_290uA")
-    enable_read_300_list = import_directory("data/figure2/data_300uA")
-    enable_read_310_list = import_directory("data/figure2/data_310uA")
+    # Import data
+    data: List[dict] = import_directory("data")
+    enable_read_290_list: List[dict] = import_directory("data/figure2/data_290uA")
+    enable_read_300_list: List[dict] = import_directory("data/figure2/data_300uA")
+    enable_read_310_list: List[dict] = import_directory("data/figure2/data_310uA")
+    data_inverse: List[dict] = import_directory("data/figure2/data_inverse")
 
-    data_inverse = import_directory("data/figure2/data_inverse")
+    dict_list: List[dict] = [enable_read_290_list, enable_read_300_list, enable_read_310_list][2]
+    data_list: List[dict] = import_directory("data/figure2/data_enable_write")
+    data_list_subset: List[dict] = [data_list[0], data_list[3], data_list[-6], data_list[-1]]
 
-    dict_list = [enable_read_290_list, enable_read_300_list, enable_read_310_list]
-    dict_list = dict_list[2]
-
-    data_list = import_directory("data/figure2/data_enable_write")
-    data_list2 = [data_list[0], data_list[3], data_list[-6], data_list[-1]]
-    colors = CMAP(np.linspace(0, 1, len(data_list2)))
-
-    # Preprocess
-    read_temperatures = []
-    enable_read_currents = []
-    for data_dict in dict_list:
-        read_temperature = get_channel_temperature(data_dict, "read")
-        enable_read_current = get_enable_read_current(data_dict)
-        read_temperatures.append(read_temperature)
-        enable_read_currents.append(enable_read_current)
-
-    enable_write_currents = []
-    write_temperatures = []
-    for i, data_dict in enumerate(data_list):
-        enable_write_current = get_enable_write_current(data_dict)
-        write_temperature = get_channel_temperature(data_dict, "write")
-        enable_write_currents.append(enable_write_current)
-        write_temperatures.append(write_temperature)
+    # Preprocess data
+    enable_read_currents, read_temperatures = preprocess_data(
+        dict_list, get_enable_read_current, get_channel_temperature, "read"
+    )
+    enable_write_currents, write_temperatures = preprocess_data(
+        data_list, get_enable_write_current, get_channel_temperature, "write"
+    )
 
     # Plot
     fig, axs = plt.subplots(
         2, 2, figsize=(8.3, 4), constrained_layout=True, width_ratios=[1, 0.25]
     )
 
-    ax: plt.Axes = axs[1, 0]
-    plot_enable_read_sweep(ax, dict_list[::-1], marker='.')
+    # Enable read sweep
+    ax = axs[1, 0]
+    plot_sweep(ax, dict_list[::-1], "bit_error_rate", "enable_read_current", marker=".")
+    plot_fill_between_array(ax, dict_list[::-1])
+    ax.axvline(IC0_C3, color="black", linestyle="--")
+    configure_axis(ax, "$I_{\mathrm{read}}$ [$\mu$A]", "BER", xlim=(READ_XMIN, READ_XMAX))
+    set_ber_ticks(ax)
+    # Enable read temperature
+    ax = axs[1, 1]
+    plot_temperature(ax, enable_read_currents[::-1], read_temperatures[::-1])
+    configure_axis(ax, "$I_{\mathrm{enable}}$ [$\mu$A]", "$T_{\mathrm{read}}$ [K]")
 
-    ax: plt.Axes = axs[1, 1]
-    plot_enable_read_temp(ax, enable_read_currents, read_temperatures)
-
+    # Enable write sweep
     ax = axs[0, 0]
-    plot_enable_write_sweep(ax, data_list2, marker=".")
-
+    plot_sweep(ax, data_list_subset, "bit_error_rate", "enable_write_current", marker=".")
+    plot_fill_between_array(ax, data_list_subset)
+    configure_axis(ax, "$I_{\mathrm{read}}$ [$\mu$A]", "BER", xlim=(READ_XMIN, READ_XMAX))
+    set_ber_ticks(ax)
+    # Enable write temperature
     ax = axs[0, 1]
-    plot_enable_write_temp(ax, enable_write_currents, write_temperatures)
+    plot_temperature(ax, enable_write_currents, write_temperatures)
+    configure_axis(ax, "$I_{\mathrm{enable}}$ [$\mu$A]", "$T_{\mathrm{write}}$ [K]")
+
     plt.show()
