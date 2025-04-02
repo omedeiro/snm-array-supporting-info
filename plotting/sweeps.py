@@ -29,7 +29,7 @@ from plotting.helpers import (
     plot_fill_between_array,
     set_ber_ticks,
 )
-from plotting.style import CMAP, CMAP3, add_ber_error_band, add_colorbar
+from plotting.style import CMAP, CMAP3, add_errorbar, add_colorbar
 
 
 def plot_read_sweep(
@@ -117,15 +117,6 @@ def plot_enable_write_sweep_multiple(
             label="Write Current [$\mu$A]",
             cmap=CMAP,
         )
-
-    if show_errorbar:
-        add_ber_error_band(
-            ax,
-            write_current_list,
-            get_bit_error_rate(dict_list[0]),
-            color="black",
-        )
-
     set_ber_ticks(ax)
     return ax
 
@@ -146,10 +137,11 @@ def plot_enable_sweep_single(
         **kwargs,
     )
     if show_errorbar:
-        add_ber_error_band(
+        add_errorbar(
             ax,
             enable_currents,
             bit_error_rate,
+            color=kwargs.get("color", 'k'),
         )
     set_ber_ticks(ax)
 

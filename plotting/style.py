@@ -113,26 +113,19 @@ def add_dict_colorbar(
     cbar.set_label(label)
     return cbar
 
-def add_ber_error_band(ax: Axes, x: np.ndarray, y: np.ndarray, color=None, alpha=0.1) -> Axes:
-    """
-    Adds a shaded error band based on binomial uncertainty.
-
-    Parameters
-    ----------
-    ax : matplotlib.axes.Axes
-        The axis to plot on.
-    x : np.ndarray
-        The x-values (e.g., current).
-    y : np.ndarray
-        The y-values (e.g., BER between 0 and 1).
-    color : any
-        Matplotlib color (optional).
-    alpha : float
-        Transparency level of the fill (default 0.1).
-    """
+def add_errorbar(ax: Axes, x: np.ndarray, y: np.ndarray, color=None) -> Axes:
     n = len(y)
     error = np.sqrt(y * (1 - y) / n)
-    ax.fill_between(x, y - error, y + error, alpha=alpha, color=color)
+    ax.errorbar(
+        x,
+        y,
+        yerr=error,
+        fmt="o",
+        color=color,
+        markersize=2,
+        elinewidth=0.5,
+        capsize=2,
+    )
     return ax
     
 def set_figsize_small():

@@ -3,15 +3,14 @@ import os
 import matplotlib.pyplot as plt
 
 from analysis.utils import import_directory
-from plotting.style import apply_snm_style
+from plotting.style import apply_snm_style, set_figsize_wide
 from plotting.sweeps import plot_enable_write_sweep_multiple
 
 apply_snm_style()
 
 
-
 def main():
-    fig, axs = plt.subplot_mosaic("BC", figsize=(180 / 25.4, 90 / 25.4))
+    fig, axs = plt.subplot_mosaic("BC", figsize=set_figsize_wide())
 
     dict_list = import_directory(
         os.path.join(os.path.dirname(__file__), "data/figure4/data")
