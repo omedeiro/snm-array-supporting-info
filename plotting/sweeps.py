@@ -1,29 +1,28 @@
 from typing import Literal
 
-import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.ticker import MultipleLocator
-import scipy.io as sio
+
 from analysis.utils import (
     IC0_C3,
     READ_XMAX,
     READ_XMIN,
+    convert_cell_to_coordinates,
+    filter_plateau,
     get_bit_error_rate,
     get_channel_temperature,
+    get_current_cell,
     get_enable_current_sweep,
     get_enable_read_current,
     get_enable_write_current,
+    get_fitting_points,
     get_read_currents,
     get_read_width,
     get_step_parameter,
     get_write_current,
     get_write_width,
-    convert_cell_to_coordinates,
-    get_current_cell,
-    get_fitting_points,
-    filter_plateau,
 )
 from plotting.arrays import build_array
 from plotting.helpers import (

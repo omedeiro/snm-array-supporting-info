@@ -1,15 +1,14 @@
-from typing import Literal
 
-import matplotlib.colors as mcolors
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
+
 from analysis.utils import (
     get_channel_temperature,
     get_enable_read_current,
     import_directory,
 )
+from plotting.style import add_dict_colorbar, apply_snm_style, set_figsize_wide
 from plotting.sweeps import plot_read_sweep_array
-from plotting.style import apply_snm_style, add_dict_colorbar, set_figsize_wide
 
 apply_snm_style()
 

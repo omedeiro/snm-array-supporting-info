@@ -1,7 +1,8 @@
-from analysis.utils import import_directory
-from plotting.sweeps import plot_full_grid
-from plotting.style import apply_snm_style, set_figsize_max
 import matplotlib.pyplot as plt
+
+from analysis.utils import import_directory
+from plotting.style import apply_snm_style, set_figsize_max
+from plotting.sweeps import plot_full_grid
 
 apply_snm_style()
 

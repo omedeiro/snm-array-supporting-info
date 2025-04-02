@@ -1,9 +1,10 @@
 import os
 
 import matplotlib.pyplot as plt
-from plotting.sweeps import plot_read_sweep_array, plot_enable_write_sweep_multiple
+
 from analysis.utils import import_directory
 from plotting.style import apply_snm_style
+from plotting.sweeps import plot_enable_write_sweep_multiple
 
 apply_snm_style()
 

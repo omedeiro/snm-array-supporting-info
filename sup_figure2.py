@@ -1,14 +1,15 @@
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
+
 from analysis.utils import (
     get_channel_temperature,
     import_directory,
 )
+from plotting.style import add_dict_colorbar, apply_snm_style, set_figsize_wide
 from plotting.sweeps import (
-    plot_read_sweep_array,
     plot_fill_between_array,
+    plot_read_sweep_array,
 )
-from plotting.style import apply_snm_style, add_dict_colorbar, set_figsize_wide
 
 apply_snm_style()
 

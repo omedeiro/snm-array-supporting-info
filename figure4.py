@@ -4,13 +4,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import ticker
 
-from plotting.sweeps import (
-    plot_enable_write_sweep_multiple,
-    plot_write_sweep,
-)
-from plotting.arrays import (
-    plot_parameter_array,
-)
 from analysis.utils import (
     convert_cell_to_coordinates,
     get_bit_error_rate,
@@ -28,25 +21,28 @@ from analysis.utils import (
     process_cell,
 )
 from cells import CELLS
+from plotting.arrays import (
+    plot_parameter_array,
+)
 from plotting.style import CMAP, CMAP2, apply_snm_style
+from plotting.sweeps import (
+    plot_enable_write_sweep_multiple,
+    plot_write_sweep,
+)
 
 apply_snm_style()
 
 
-# range set 1 [::2]
 def plot_enable_sweep(
     ax: plt.Axes,
     dict_list: list[dict],
     range=None,
-    add_errorbar=False,
     show_colorbar=False,
 ):
-    N = len(dict_list)
     if range is not None:
         dict_list = dict_list[range]
-    # ax, ax2 = plot_enable_write_sweep_multiple(ax, dict_list[0:6])
     ax = plot_enable_write_sweep_multiple(
-        ax, dict_list, N=N, show_colorbar=show_colorbar
+        ax, dict_list, show_colorbar=show_colorbar
     )
 
     ax.set_ylabel("BER")

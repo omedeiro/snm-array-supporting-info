@@ -1,4 +1,5 @@
 import os
+from typing import Literal
 
 import matplotlib as mpl
 import matplotlib.colors as mcolors
@@ -8,10 +9,11 @@ import numpy as np
 from cycler import cycler
 from matplotlib.axes import Axes
 from matplotlib.ticker import MultipleLocator
-from typing import Literal
+
 from analysis.utils import (
     get_enable_read_current,
 )
+
 # Color palettes
 CMAP = plt.get_cmap("coolwarm")
 CMAP2 = plt.get_cmap("viridis")

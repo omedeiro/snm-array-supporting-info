@@ -1,19 +1,20 @@
+from typing import Callable, List, Optional, Tuple
+
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.ticker import Locator
-from typing import List, Optional, Tuple, Callable
 
-from plotting.helpers import plot_fill_between_array, set_ber_ticks
 from analysis.utils import (
     get_channel_temperature,
     get_enable_read_current,
     get_enable_write_current,
     import_directory,
 )
-from plotting.sweeps import plot_read_sweep
+from plotting.helpers import plot_fill_between_array, set_ber_ticks
 from plotting.style import CMAP
+from plotting.sweeps import plot_read_sweep
 
 READ_XMIN: int = 400
 READ_XMAX: int = 1000
