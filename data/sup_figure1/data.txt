@@ -1,0 +1,16 @@
+A1_total_switches_norm.mat
+A2_total_switches_norm.mat
+A3_total_switches_norm.mat
+A4_total_switches_norm.mat
+B1_total_switches_norm.mat
+B2_total_switches_norm.mat
+B3_total_switches_norm.mat
+B4_total_switches_norm.mat
+C1_total_switches_norm.mat
+C2_total_switches_norm.mat
+C3_total_switches_norm.mat
+C4_total_switches_norm.mat
+D1_total_switches_norm.mat
+D2_total_switches_norm.mat
+D3_total_switches_norm.mat
+D4_total_switches_norm.mat

@@ -3,6 +3,7 @@ from typing import Dict
 import numpy as np
 from matplotlib.collections import PolyCollection
 from matplotlib.pyplot import Axes
+from matplotlib.ticker import MultipleLocator
 
 from analysis.utils import (
     get_bit_error_rate,
@@ -33,3 +34,8 @@ def plot_fill_between_array(ax: Axes, dict_list: list[dict]) -> Axes:
         plot_fill_between(ax, data_dict, colors[i])
     return ax
 
+
+def set_ber_ticks(ax: Axes) -> Axes:
+    ax.set_ylim(0, 1)
+    ax.yaxis.set_major_locator(MultipleLocator(0.5))
+    return ax

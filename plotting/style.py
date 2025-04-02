@@ -12,7 +12,7 @@ from matplotlib.ticker import MultipleLocator
 # Color palettes
 CMAP = plt.get_cmap("coolwarm")
 CMAP2 = plt.get_cmap("viridis")
-
+CMAP3 = plt.get_cmap("plasma")
 COLORS = [
     "#1b9e77",  # Teal green
     "#d95f02",  # Burnt orange
@@ -108,7 +108,9 @@ def set_figsize_wide():
 def set_figsize_square():
     mpl.rcParams["figure.figsize"] = [3.5, 3.5]
 
-
+def set_figsize_max():
+    mpl.rcParams["figure.figsize"] = [7, 7]
+    
 def format_ber_axis(ax: Axes) -> Axes:
     ax.set_ylim(0, 1)
     ax.yaxis.set_major_locator(MultipleLocator(0.5))

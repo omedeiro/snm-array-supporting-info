@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.ticker import MultipleLocator
-
+import scipy.io as sio
 from analysis.utils import (
     IC0_C3,
     READ_XMAX,
@@ -20,12 +20,17 @@ from analysis.utils import (
     get_step_parameter,
     get_write_current,
     get_write_width,
+    convert_cell_to_coordinates,
+    get_current_cell,
+    get_fitting_points,
+    filter_plateau,
 )
 from plotting.arrays import build_array
 from plotting.helpers import (
     plot_fill_between_array,
+    set_ber_ticks,
 )
-from plotting.style import CMAP, add_ber_error_band, add_colorbar
+from plotting.style import CMAP, CMAP3, add_ber_error_band, add_colorbar
 
 
 def plot_read_sweep(
@@ -122,8 +127,7 @@ def plot_enable_write_sweep_multiple(
             color="black",
         )
 
-    ax.set_ylim(0, 1)
-    ax.yaxis.set_major_locator(MultipleLocator(0.5))
+    set_ber_ticks(ax)
     return ax
 
 
@@ -150,9 +154,9 @@ def plot_enable_sweep_single(
             data_dict,
             **kwargs,
         )
+    set_ber_ticks(ax)
+
     ax.set_xlim(enable_currents[0], enable_currents[-1])
-    ax.set_ylim(0, 1)
-    ax.yaxis.set_major_locator(MultipleLocator(0.5))
     ax.xaxis.set_major_locator(MultipleLocator(25))
     ax.xaxis.set_minor_locator(MultipleLocator(5))
     return ax
@@ -170,8 +174,8 @@ def plot_read_sweep_switch_probability(
         total_switch_probability,
         **kwargs,
     )
-    ax.yaxis.set_major_locator(MultipleLocator(0.5))
-    ax.set_ylim(0, 1)
+    
+    set_ber_ticks(ax)
     return ax
 
 
@@ -223,10 +227,10 @@ def plot_current_sweep_ber(
     base_label = f" {kwargs['label']}" if "label" in kwargs else ""
     kwargs.pop("label", None)
     ax.plot(sweep_current, ber, label=f"{base_label}", **kwargs)
-    ax.set_ylim(0, 1)
-    ax.yaxis.set_major_locator(plt.MultipleLocator(0.5))
     ax.set_xlim(650, 850)
     ax.xaxis.set_major_locator(plt.MultipleLocator(50))
+
+    set_ber_ticks(ax)
     return ax
 
 
@@ -244,12 +248,10 @@ def plot_current_sweep_switching(
     base_label = f" {kwargs['label']}" if "label" in kwargs else ""
     kwargs.pop("label", None)
     ax.plot(sweep_current, switching_probability, label=f"{base_label}", **kwargs)
-    # ax.set_ylabel("switching_probability")
-    # ax.set_xlabel(f"{sweep_param} (uA)")
-    ax.set_ylim(0, 1)
-    ax.yaxis.set_major_locator(plt.MultipleLocator(0.5))
     ax.set_xlim(650, 850)
     ax.xaxis.set_major_locator(plt.MultipleLocator(50))
+
+    set_ber_ticks(ax)
     return ax
 
 
@@ -291,7 +293,6 @@ def plot_write_sweep(ax: Axes, dict_list: str) -> Axes:
     enable_write_current_list = []
     for i, data_dict in enumerate(dict_list):
         x, y, ztotal = build_array(data_dict, "bit_error_rate")
-        _, _, zswitch = build_array(data_dict, "total_switches_norm")
         write_temp = get_channel_temperature(data_dict, "write")
         enable_write_current = get_enable_write_current(data_dict)
         write_temp_list.append(write_temp)
@@ -322,7 +323,7 @@ def plot_read_sweep_array(
     dict_list: list[dict],
     value_name: str,
     variable_name: str,
-    colorbar=None,
+    show_colorbar=None,
     show_errorbar=False,
     **kwargs,
 ) -> Axes:
@@ -340,14 +341,13 @@ def plot_read_sweep_array(
         )
         variable_list.append(data_dict[variable_name].flatten()[0] * 1e6)
 
-    if colorbar is not None:
-        norm = mcolors.Normalize(
-            vmin=min(variable_list), vmax=max(variable_list)
-        )  # Normalize for colormap
-        sm = plt.cm.ScalarMappable(cmap=CMAP, norm=norm)
-        sm.set_array([])
-        cbar = plt.colorbar(sm, ax=ax, orientation="vertical", fraction=0.05, pad=0.05)
-        cbar.set_label("Write Current [$\mu$A]")
+    if show_colorbar:
+        add_colorbar(
+            ax,
+            variable_list,
+            label="Write Current [$\mu$A]",
+            cmap=CMAP,
+        )
 
     return ax
 
@@ -397,3 +397,114 @@ def plot_read_switch_probability_array(
             plot_read_sweep_switch_probability(ax, data_dict, color=colors[i])
     return ax
 
+
+def plot_full_grid(axs, dict_list):
+    plot_grid(axs[1:5, 0:4], dict_list)
+    plot_row_or_column(axs[0, 0:4], dict_list, is_row=True)
+    plot_row_or_column(axs[1:5, 4], dict_list, is_row=False)
+    axs[0, 4].axis("off")
+    axs[4, 0].set_xlabel("Enable Current ($\mu$A)")
+    axs[4, 0].set_ylabel("Critical Current ($\mu$A)")
+    return axs
+
+
+def plot_row_or_column(axs, dict_list, is_row=True):
+    colors = CMAP3(np.linspace(0.1, 1, 4))
+    markers = ["o", "s", "D", "^"]
+    for data_dict in dict_list:
+        cell = get_current_cell(data_dict)
+        column, row = convert_cell_to_coordinates(cell)
+        x = data_dict["x"][0]
+        y = data_dict["y"][0]
+        ztotal = data_dict["ztotal"]
+        xfit, yfit = get_fitting_points(x, y, ztotal)
+
+        index = column if is_row else row
+        axs[index].plot(
+            xfit,
+            yfit,
+            label=f"{cell}",
+            color=colors[column],
+            marker=markers[row],
+            markeredgecolor="k",
+            markeredgewidth=0.1,
+        )
+        axs[index].legend(loc="upper right")
+        axs[index].set_xlim(0, 600)
+        axs[index].set_ylim(0, 1500)
+    return axs
+
+
+def plot_grid(axs: Axes, dict_list: list[dict]) -> Axes:
+    colors = CMAP3(np.linspace(0.1, 1, 4))
+    markers = ["o", "s", "D", "^"]
+    for data_dict in dict_list:
+        cell = get_current_cell(data_dict)
+
+        column, row = convert_cell_to_coordinates(cell)
+        x = data_dict["x"][0]
+        y = data_dict["y"][0]
+        ztotal = data_dict["ztotal"]
+        xfit, yfit = get_fitting_points(x, y, ztotal)
+        axs[row, column].plot(
+            xfit,
+            yfit,
+            label=f"{cell}",
+            color=colors[column],
+            marker=markers[row],
+        )
+        y_step_size = y[1] - y[0]
+        axs[row, column].errorbar(
+            xfit,
+            yfit,
+            yerr=y_step_size* np.ones_like(yfit),
+            fmt="o",
+            color=colors[column],
+            marker=markers[row],
+            markeredgecolor="k",
+            markeredgewidth=0.1,
+            markersize=5,
+            alpha=0.5,
+            zorder=1,
+            label="_data",
+        )
+
+        xfit, yfit = filter_plateau(xfit, yfit, yfit[0] * 0.75)
+
+        plot_linear_fit(
+            axs[row, column],
+            xfit,
+            yfit,
+        )
+        # plot_optimal_enable_currents(axs[row, column], data_dict)
+        axs[row, column].legend(loc="upper right")
+        axs[row, column].set_xlim(0, 600)
+        axs[row, column].set_ylim(0, 1500)
+    axs[-1, 0].set_xlabel("Enable Current ($\mu$A)")
+    axs[-1, 0].set_ylabel("Critical Current ($\mu$A)")
+    return axs
+
+
+
+
+def plot_linear_fit(ax: Axes, xfit: np.ndarray, yfit: np.ndarray, add_text:bool=False) -> Axes:
+    z = np.polyfit(xfit, yfit, 1)
+    p = np.poly1d(z)
+    x_intercept = -z[1] / z[0]
+    # ax.scatter(xfit, yfit, color="#08519C")
+    xplot = np.linspace(0, x_intercept, 10)
+    ax.plot(xplot, p(xplot), ":", color="k")
+    if add_text:
+        ax.text(
+            0.1,
+            0.1,
+            f"{p[1]:.3f}x + {p[0]:.3f}\n$x_{{int}}$ = {x_intercept:.2f}",
+            fontsize=12,
+            color="red",
+            backgroundcolor="white",
+            transform=ax.transAxes,
+        )
+    ax.set_xlim((0, 600))
+    ax.set_ylim((0, 2000))
+
+    return ax

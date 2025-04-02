@@ -137,6 +137,13 @@ def get_read_current(data_dict: dict) -> float:
     if data_dict.get("read_current").shape[1] == 1:
         return filter_first(data_dict.get("read_current")) * 1e6
 
+def get_fitting_points(
+    x: np.ndarray, y: np.ndarray, ztotal: np.ndarray
+) -> Tuple[np.ndarray, np.ndarray]:
+    mid_idx = np.where(ztotal > np.nanmax(ztotal, axis=0) / 2)
+    xfit, xfit_idx = np.unique(x[mid_idx[1]], return_index=True)
+    yfit = y[mid_idx[0]][xfit_idx]
+    return xfit, yfit
 
 
 def calculate_channel_temperature(
@@ -246,12 +253,25 @@ def get_current_cell(data_dict: dict) -> str:
     return cell
 
 
+
 def filter_first(value) -> any:
     if isinstance(value, collections.abc.Iterable) and not isinstance(
         value, (str, bytes)
     ):
         return np.asarray(value).flatten()[0]
     return value
+
+def filter_plateau(
+    xfit: np.ndarray, yfit: np.ndarray, plateau_height: float
+) -> Tuple[np.ndarray, np.ndarray]:
+    xfit = np.where(yfit < plateau_height, xfit, np.nan)
+    yfit = np.where(yfit < plateau_height, yfit, np.nan)
+
+    # Remove nans
+    xfit = xfit[~np.isnan(xfit)]
+    yfit = yfit[~np.isnan(yfit)]
+
+    return xfit, yfit
 
 
 def get_enable_read_current(data_dict: dict) -> float:
