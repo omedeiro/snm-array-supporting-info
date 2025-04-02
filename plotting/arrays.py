@@ -7,9 +7,13 @@ from matplotlib.axes import Axes
 from matplotlib.colors import LogNorm
 
 from analysis.utils import (
+    convert_cell_to_coordinates,
     filter_first,
     get_total_switches_norm,
+    initialize_dict,
+    process_cell,
 )
+from cells import CELLS
 
 
 def build_array(
@@ -58,3 +62,36 @@ def plot_parameter_array(
     ax.tick_params(axis="both", length=0)
     return ax
 
+
+
+def plot_ber_grid(ax: plt.Axes):
+    ARRAY_SIZE = (4, 4)
+    param_dict = initialize_dict(ARRAY_SIZE)
+    xloc_list = []
+    yloc_list = []
+    for c in CELLS:
+        xloc, yloc = convert_cell_to_coordinates(c)
+        param_dict = process_cell(CELLS[c], param_dict, xloc, yloc)
+        xloc_list.append(xloc)
+        yloc_list.append(yloc)
+
+    plot_parameter_array(
+        ax,
+        xloc_list,
+        yloc_list,
+        param_dict["bit_error_rate"],
+        log=True,
+        cmap=plt.get_cmap("Blues").reversed(),
+    )
+
+    ax.xaxis.set_label_position("bottom")
+    ax.xaxis.set_ticks_position("bottom")
+    ax.set_xlabel("Column")
+    ax.set_ylabel("Row")
+    cax = ax.inset_axes([1.10, 0, 0.1, 1])
+    fig = plt.gcf()
+    cbar = fig.colorbar(
+        ax.get_children()[0], cax=cax, orientation="vertical", label="minimum BER"
+    )
+
+    return ax

@@ -5,7 +5,6 @@ import numpy as np
 from matplotlib import ticker
 
 from analysis.utils import (
-    convert_cell_to_coordinates,
     get_bit_error_rate,
     get_bit_error_rate_args,
     get_channel_temperature,
@@ -17,12 +16,9 @@ from analysis.utils import (
     get_read_currents,
     get_write_current,
     import_directory,
-    initialize_dict,
-    process_cell,
 )
-from cells import CELLS
 from plotting.arrays import (
-    plot_parameter_array,
+    plot_ber_grid,
 )
 from plotting.style import CMAP, CMAP2, apply_snm_style
 from plotting.sweeps import (
@@ -175,37 +171,6 @@ def plot_delay(ax: plt.Axes, data_dict: dict):
     ax.set_ylim([1e-4, 1e-3])
     ax.yaxis.set_minor_formatter(ticker.NullFormatter())
 
-
-def plot_ber_grid(ax: plt.Axes):
-    ARRAY_SIZE = (4, 4)
-    param_dict = initialize_dict(ARRAY_SIZE)
-    xloc_list = []
-    yloc_list = []
-    for c in CELLS:
-        xloc, yloc = convert_cell_to_coordinates(c)
-        param_dict = process_cell(CELLS[c], param_dict, xloc, yloc)
-        xloc_list.append(xloc)
-        yloc_list.append(yloc)
-
-    plot_parameter_array(
-        ax,
-        xloc_list,
-        yloc_list,
-        param_dict["bit_error_rate"],
-        log=True,
-        cmap=plt.get_cmap("Blues").reversed(),
-    )
-
-    ax.xaxis.set_label_position("bottom")
-    ax.xaxis.set_ticks_position("bottom")
-    ax.set_xlabel("Column")
-    ax.set_ylabel("Row")
-    cax = ax.inset_axes([1.10, 0, 0.1, 1])
-    cbar = fig.colorbar(
-        ax.get_children()[0], cax=cax, orientation="vertical", label="minimum BER"
-    )
-
-    return ax
 
 
 def import_write_sweep_formatted() -> list[dict]:
