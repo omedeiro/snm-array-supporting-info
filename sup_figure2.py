@@ -1,13 +1,10 @@
-import matplotlib.font_manager as fm
-import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-import matplotlib.colors as mcolors
+import matplotlib.pyplot as plt
 from nmem.analysis.analysis import (
+    get_channel_temperature,
     import_directory,
     plot_fill_between_array,
     plot_read_sweep_array,
-    get_channel_temperature,
-    CMAP3,
 )
 from nmem.analysis.read_current_sweep_write_current2.write_current_sweep import (
     add_colorbar,

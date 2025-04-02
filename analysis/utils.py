@@ -3,7 +3,6 @@ import os
 from typing import Literal, Tuple
 
 import ltspice
-import matplotlib.pyplot as plt
 import numpy as np
 import scipy.io as sio
 
@@ -15,8 +14,6 @@ READ_XMIN = 400
 READ_XMAX = 1000
 IC0_C3 = 910
 VOLTAGE_THRESHOLD = 2.0e-3
-
-CMAP = plt.get_cmap("coolwarm")
 
 
 def calculate_heater_power(heater_current: float, heater_resistance: float) -> float:
@@ -442,22 +439,6 @@ def process_read_data(ltsp: ltspice.Ltspice) -> dict:
         }
     return data_dict
 
-
-def build_array(
-    data_dict: dict, parameter_z: Literal["total_switches_norm"]
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    if data_dict.get("total_switches_norm") is None:
-        data_dict["total_switches_norm"] = get_total_switches_norm(data_dict)
-    x: np.ndarray = data_dict.get("x")[0][:, 0] * 1e6
-    y: np.ndarray = data_dict.get("y")[0][:, 0] * 1e6
-    z: np.ndarray = data_dict.get(parameter_z)
-
-    xlength: int = filter_first(data_dict.get("sweep_x_len", len(x)))
-    ylength: int = filter_first(data_dict.get("sweep_y_len", len(y)))
-
-    # X, Y reversed in reshape
-    zarray = z.reshape((ylength, xlength), order="F")
-    return x, y, zarray
 
 
 def get_enable_current_sweep(data_dict: dict) -> np.ndarray:

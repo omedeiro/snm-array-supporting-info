@@ -4,10 +4,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import ticker
 
-from analysis.plotting import (
+from plotting.sweeps import (
     plot_enable_write_sweep_multiple,
-    plot_parameter_array,
     plot_write_sweep,
+)
+from plotting.arrays import (
+    plot_parameter_array,
 )
 from analysis.utils import (
     convert_cell_to_coordinates,
@@ -26,11 +28,9 @@ from analysis.utils import (
     process_cell,
 )
 from cells import CELLS
+from plotting.style import CMAP, CMAP2, apply_snm_style
 
-C0 = "#1b9e77"
-C1 = "#d95f02"
-RBCOLORS = plt.get_cmap("coolwarm")(np.linspace(0, 1, 4))
-CMAP2 = plt.get_cmap("viridis")
+apply_snm_style()
 
 
 # range set 1 [::2]
@@ -39,14 +39,14 @@ def plot_enable_sweep(
     dict_list: list[dict],
     range=None,
     add_errorbar=False,
-    add_colorbar=False,
+    show_colorbar=False,
 ):
     N = len(dict_list)
     if range is not None:
         dict_list = dict_list[range]
     # ax, ax2 = plot_enable_write_sweep_multiple(ax, dict_list[0:6])
     ax = plot_enable_write_sweep_multiple(
-        ax, dict_list, add_errorbar=add_errorbar, N=N, add_colorbar=add_colorbar
+        ax, dict_list, N=N, show_colorbar=show_colorbar
     )
 
     ax.set_ylabel("BER")
@@ -57,10 +57,10 @@ def plot_enable_sweep(
 def plot_enable_sweep_markers(ax: plt.Axes, dict_list: list[dict]):
     ax.yaxis.set_major_locator(plt.MultipleLocator(0.20))
     ax.set_ylim([8.3, 9.7])
-
-    write_temp_array = np.empty((len(dict_list), 4))
+    N=4
+    write_temp_array = np.empty((len(dict_list), N))
     write_current_array = np.empty((len(dict_list), 1))
-    enable_current_array = np.empty((len(dict_list), 4))
+    enable_current_array = np.empty((len(dict_list), N))
     for j, data_dict in enumerate(dict_list):
         bit_error_rate = get_bit_error_rate(data_dict)
         berargs = get_bit_error_rate_args(bit_error_rate)
@@ -74,7 +74,8 @@ def plot_enable_sweep_markers(ax: plt.Axes, dict_list: list[dict]):
                 write_temp_array[j, i] = write_temps[arg]
                 enable_current_array[j, i] = enable_currents[arg]
     markers = ["o", "s", "D", "^"]
-    for i in range(4):
+    colors = CMAP(np.linspace(0, 1, N))
+    for i in range(N):
         ax.plot(
             enable_current_array[:, i],
             write_current_array,
@@ -82,7 +83,7 @@ def plot_enable_sweep_markers(ax: plt.Axes, dict_list: list[dict]):
             marker=markers[i],
             markeredgecolor="k",
             markeredgewidth=0.5,
-            color=RBCOLORS[i],
+            color=colors[i],
         )
     ax.set_ylim(0, 100)
     ax.set_xlim(250, 340)

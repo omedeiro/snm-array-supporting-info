@@ -1,13 +1,14 @@
-import matplotlib.pyplot as plt
+from typing import Literal
+
 import matplotlib.colors as mcolors
 import matplotlib.gridspec as gridspec
-from typing import Literal
+import matplotlib.pyplot as plt
 from nmem.analysis.analysis import (
-    import_directory,
-    plot_read_sweep_array,
+    CMAP3,
     get_channel_temperature,
     get_enable_read_current,
-    CMAP3,
+    import_directory,
+    plot_read_sweep_array,
 )
 
 

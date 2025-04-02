@@ -1,11 +1,7 @@
 import matplotlib.pyplot as plt
-
 from nmem.analysis.analysis import (
     import_directory,
-    plot_column,
     plot_full_grid,
-    plot_grid,
-    plot_row,
 )
 
 if __name__ == "__main__":

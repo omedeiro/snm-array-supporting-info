@@ -1,7 +1,8 @@
+import os
+
+import matplotlib.pyplot as plt
 from nmem.analysis.analysis import import_directory, plot_read_sweep_array
 from nmem.analysis.write_current_sweep_operation_v2 import plot_enable_sweep
-import matplotlib.pyplot as plt
-import os
 
 
 def plot_write_current_sweep(

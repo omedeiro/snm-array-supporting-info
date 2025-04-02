@@ -4,42 +4,45 @@ import ltspice
 import numpy as np
 from matplotlib import pyplot as plt
 
-from analysis.plotting import (
-    create_plot,
+from plotting.sweeps import (
     plot_current_sweep_ber,
     plot_current_sweep_switching,
     plot_read_sweep_array,
     plot_read_switch_probability_array,
 )
 from analysis.utils import (
-    CMAP,
     filter_first,
     import_directory,
     process_read_data,
 )
+from plotting.style import CMAP, apply_snm_style
+from plotting.transients import (
+    create_plot,
+)
+
+apply_snm_style()
+
 
 if __name__ == "__main__":
 
-    # get raw files
-    files = os.listdir("data/figure3/")
-    files = [f for f in files if f.endswith(".raw")]
-    # Sort files by write current
+    # Get and parse raw files
+    files = [f for f in os.listdir("data/figure3/") if f.endswith(".raw")]
+    parsed_data = {}
     write_current_list = []
+
     for file in files:
-        data = ltspice.Ltspice(
-            f"data/figure3/{file}"
-        ).parse()
+        data = ltspice.Ltspice(f"data/figure3/{file}").parse()
         ltsp_data_dict = process_read_data(data)
-        write_current = ltsp_data_dict[0]["write_current"][0]
-        write_current_list.append(write_current * 1e6)
+        parsed_data[file] = ltsp_data_dict
+        write_current = ltsp_data_dict[0]["write_current"][0] * 1e6
+        write_current_list.append(write_current)
 
-    sorted_args = np.argsort(write_current_list)
-    files = [files[i] for i in sorted_args]
+    # Sort files and data by write current
+    sorted_files_data = sorted(zip(files, write_current_list), key=lambda x: x[1])
+    files, write_current_list = zip(*sorted_files_data)
 
-    ltsp_data = ltspice.Ltspice(
-        "data/figure3/nmem_cell_read_example_trace.raw"
-    ).parse()
-    ltsp_data_dict = process_read_data(ltsp_data)
+    # Parse example trace once
+    ltsp_data_dict = parsed_data["nmem_cell_read_example_trace.raw"]
 
     inner = [
         ["T0", "T1", "T2", "T3"],
@@ -87,16 +90,14 @@ if __name__ == "__main__":
 
     dict_list = import_directory(
         "/home/omedeiro/nmem/src/nmem/analysis/read_current_sweep_write_current2/write_current_sweep_C3"
-    )
-    dict_list = dict_list[::2]
-    write_current_list = []
-    for data_dict in dict_list:
-        write_current = filter_first(data_dict["write_current"])
-        write_current_list.append(write_current * 1e6)
+    )[::2]
+    write_current_list = [
+        filter_first(data_dict["write_current"]) * 1e6 for data_dict in dict_list
+    ]
 
-    sorted_args = np.argsort(write_current_list)
-    dict_list = [dict_list[i] for i in sorted_args]
-    write_current_list = [write_current_list[i] for i in sorted_args]
+    # Sort dict_list and write_current_list together
+    sorted_dicts = sorted(zip(dict_list, write_current_list), key=lambda x: x[1])
+    dict_list, write_current_list = zip(*sorted_dicts)
 
     plot_read_sweep_array(
         axs["A"],
@@ -114,7 +115,6 @@ if __name__ == "__main__":
         axs["B"], dict_list, write_current_list, marker=".", linestyle="-", markersize=2
     )
     axs["B"].set_xlim(650, 850)
-    # ax.axvline(IRM, color="black", linestyle="--", linewidth=0.5)
     axs["B"].set_xlabel("$I_{\mathrm{read}}$ [$\mu$A]", labelpad=-1)
     axs["D"].set_xlabel("$I_{\mathrm{read}}$ [$\mu$A]", labelpad=-1)
 
@@ -125,33 +125,29 @@ if __name__ == "__main__":
     axs["B"].set_ylabel("Switching Probability")
     axs["D"].set_ylabel("Switching Probability")
 
-    # fig, ax = plt.subplots(4, 1, figsize=(6, 3))
-
-    # plot_current_sweep_output(ax[0], data_dict)
     colors = CMAP(np.linspace(0, 1, len(dict_list)))
     col_set = [colors[i] for i in [0, 2, -1]]
-    files = [files[i] for i in [0, 2, 11]]
+    selected_files = [files[i] for i in [0, 2, 11]]
     max_write_current = 300
-    for i, file in enumerate(files):
-        data = ltspice.Ltspice(
-            f"/home/omedeiro/nmem/src/nmem/analysis/read_current_sweep_sim/{file}"
-        ).parse()
-        ltsp_data_dict = process_read_data(data)
+
+    for file in selected_files:
+        ltsp_data_dict = parsed_data[file]
         ltsp_write_current = ltsp_data_dict[0]["write_current"][0]
+        normalized_color = CMAP(ltsp_write_current / max_write_current)
+
         plot_current_sweep_ber(
             axs["C"],
             ltsp_data_dict,
-            color=CMAP(ltsp_write_current / max_write_current),
+            color=normalized_color,
             label=f"{ltsp_write_current} $\mu$A",
             marker=".",
             linestyle="-",
             markersize=5,
         )
-
         plot_current_sweep_switching(
             axs["D"],
             ltsp_data_dict,
-            color=CMAP(ltsp_write_current / max_write_current),
+            color=normalized_color,
             label=f"{ltsp_write_current} $\mu$A",
             marker=".",
             markersize=5,
@@ -162,15 +158,11 @@ if __name__ == "__main__":
     axs["C"].axvline(case_current, color="black", linestyle="--", linewidth=0.5)
     axs["D"].axvline(case_current, color="black", linestyle="--", linewidth=0.5)
 
-    # axs["A"].legend(loc="upper left", bbox_to_anchor=(1.0, 1.05))
     axs["B"].legend(
         loc="upper right",
         labelspacing=0.1,
         fontsize=6,
     )
-    # axs["C"].legend(
-    #     loc="upper right",
-    # )
     axs["D"].legend(
         loc="upper right",
         labelspacing=0.1,

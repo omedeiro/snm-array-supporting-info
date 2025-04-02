@@ -3,17 +3,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes
 
-from analysis.plotting import (
+from plotting.helpers import (
     plot_fill_between,
-    plot_read_sweep,
 )
 from analysis.utils import (
-    CMAP,
     get_channel_temperature,
     get_enable_read_current,
     get_enable_write_current,
     import_directory,
 )
+from plotting.sweeps import (
+    plot_read_sweep,
+)
+from plotting.style import CMAP
 
 READ_XMIN = 400
 READ_XMAX = 1000
