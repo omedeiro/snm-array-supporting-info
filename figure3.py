@@ -4,11 +4,11 @@ import ltspice
 import numpy as np
 from matplotlib import pyplot as plt
 
-from analysis.constants import (
+from analysis.data_processing import (
     filter_first,
-    import_directory,
     process_read_data,
 )
+from analysis.file_utils import import_directory
 from plotting.style import CMAP, apply_snm_style
 from plotting.sweeps import (
     plot_current_sweep_ber,
@@ -23,8 +23,8 @@ from plotting.transients import (
 apply_snm_style()
 
 
-if __name__ == "__main__":
-
+def main():
+    
     # Get and parse raw files
     files = [
         f for f in os.listdir("data/figure3/read_current_sweep/") if f.endswith(".raw")
@@ -186,3 +186,7 @@ if __name__ == "__main__":
     )
 
     plt.show()
+
+
+if __name__ == "__main__":
+    main()

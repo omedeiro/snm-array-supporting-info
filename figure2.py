@@ -6,12 +6,12 @@ import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.ticker import Locator
 
-from analysis.constants import (
+from analysis.data_processing import (
     get_channel_temperature,
     get_enable_read_current,
     get_enable_write_current,
-    import_directory,
 )
+from analysis.file_utils import import_directory
 from plotting.helpers import plot_fill_between_array, set_ber_ticks
 from plotting.style import CMAP
 from plotting.sweeps import plot_read_sweep
@@ -116,8 +116,8 @@ def preprocess_data(
     return currents, temperatures
 
 
-if __name__ == "__main__":
-    # Import data
+def main():
+        # Import data
     data: List[dict] = import_directory("data")
     enable_read_290_list: List[dict] = import_directory("data/figure2/data_290uA")
     enable_read_300_list: List[dict] = import_directory("data/figure2/data_300uA")
@@ -165,3 +165,7 @@ if __name__ == "__main__":
     configure_axis(ax, "$I_{\mathrm{enable}}$ [$\mu$A]", "$T_{\mathrm{write}}$ [K]")
 
     plt.show()
+
+
+if __name__ == "__main__":
+    main()

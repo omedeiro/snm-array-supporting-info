@@ -6,15 +6,15 @@ import ltspice
 import numpy as np
 
 from .calculations import calculate_channel_temperature, safe_max, safe_min
+from .circuit_utils import (
+    get_current_or_voltage,
+    get_ltsp_ber,
+    get_ltsp_prob,
+)
 from .constants import (
     CELLS,
     CRITICAL_TEMP,
     SUBSTRATE_TEMP,
-)
-from .data_processing import (
-    get_bit_error_rate_thresh,
-    get_current_or_voltage,
-    get_switching_probability,
 )
 
 
@@ -72,10 +72,10 @@ def process_read_data(ltsp: ltspice.Ltspice) -> dict:
         read_zero_voltage[i] = safe_max(output_voltage, masks["read_zero"])
         read_one_voltage[i] = safe_max(output_voltage, masks["read_one"])
         read_margin[i] = read_zero_voltage[i] - read_one_voltage[i]
-        bit_error_rate[i] = get_bit_error_rate_thresh(
+        bit_error_rate[i] = get_ltsp_ber(
             read_zero_voltage[i], read_one_voltage[i]
         )
-        switching_probability[i] = get_switching_probability(
+        switching_probability[i] = get_ltsp_prob(
             read_zero_voltage[i], read_one_voltage[i]
         )
         data_dict[i] = {
@@ -117,6 +117,27 @@ def get_enable_current_sweep(data_dict: dict) -> np.ndarray:
         enable_current_array = data_dict.get("y")[:, :, 0].flatten() * 1e6
 
     return enable_current_array
+
+
+def get_bit_error_rate_args(bit_error_rate: np.ndarray) -> list:
+    nominal_args = np.argwhere(bit_error_rate < 0.45)
+    inverting_args = np.argwhere(bit_error_rate > 0.55)
+
+    if len(inverting_args) > 0:
+        inverting_arg1 = inverting_args[0][0]
+        inverting_arg2 = inverting_args[-1][0]
+    else:
+        inverting_arg1 = np.nan
+        inverting_arg2 = np.nan
+
+    if len(nominal_args) > 0:
+        nominal_arg1 = nominal_args[0][0]
+        nominal_arg2 = nominal_args[-1][0]
+    else:
+        nominal_arg1 = np.nan
+        nominal_arg2 = np.nan
+
+    return nominal_arg1, nominal_arg2, inverting_arg1, inverting_arg2
 
 
 

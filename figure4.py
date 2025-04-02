@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import ticker
 
-from analysis.constants import (
+from analysis.data_processing import (
     get_bit_error_rate,
     get_bit_error_rate_args,
     get_channel_temperature,
@@ -15,8 +15,8 @@ from analysis.constants import (
     get_read_current,
     get_read_currents,
     get_write_current,
-    import_directory,
 )
+from analysis.file_utils import import_directory
 from plotting.arrays import (
     plot_ber_grid,
 )
@@ -244,7 +244,8 @@ def import_write_sweep_formatted_markers(dict_list) -> list[dict]:
     return data_dict
 
 
-if __name__ == "__main__":
+
+def main():
     inner = [
         ["A", "C"],
     ]
@@ -300,3 +301,8 @@ if __name__ == "__main__":
     bergrid_pos = axs["bergrid"].get_position()
 
     plt.show()
+
+
+
+if __name__ == "__main__":
+    main()
