@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import ticker
 
-from analysis.utils import (
+from analysis.constants import (
     get_bit_error_rate,
     get_bit_error_rate_args,
     get_channel_temperature,

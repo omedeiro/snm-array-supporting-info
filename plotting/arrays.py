@@ -6,14 +6,16 @@ import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.colors import LogNorm
 
-from analysis.utils import (
+from analysis.cell_utils import (
     convert_cell_to_coordinates,
-    filter_first,
-    get_total_switches_norm,
     initialize_dict,
     process_cell,
 )
-from cells import CELLS
+from analysis.constants import CELLS
+from analysis.data_processing import (
+    filter_first,
+    get_total_switches_norm,
+)
 
 
 def build_array(

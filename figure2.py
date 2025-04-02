@@ -6,7 +6,7 @@ import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.ticker import Locator
 
-from analysis.utils import (
+from analysis.constants import (
     get_channel_temperature,
     get_enable_read_current,
     get_enable_write_current,

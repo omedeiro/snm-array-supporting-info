@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from analysis.utils import import_directory
+from analysis.constants import import_directory
 from plotting.style import apply_snm_style, set_figsize_square
 from plotting.transients import plot_voltage_hist, plot_voltage_trace_averaged
 

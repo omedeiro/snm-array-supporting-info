@@ -3,7 +3,7 @@ from typing import Literal
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 
-from analysis.utils import (
+from analysis.data_processing import (
     get_voltage_trace_data,
 )
 from plotting.style import CMAP
@@ -21,9 +21,6 @@ def plot_transient(
         time = data["time"]
         signal = data[signal_name]
         ax.plot(time, signal, **kwargs)
-    # ax.set_xlabel("Time (s)")
-    # ax.set_ylabel(f"{signal_name}")
-    # ax.legend(loc="upper right")
     ax.grid(True, which="both", linestyle="--", linewidth=0.5)
     return ax
 

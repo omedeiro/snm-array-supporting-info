@@ -5,12 +5,18 @@ import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.ticker import MultipleLocator
 
-from analysis.utils import (
+from analysis.calculations import (
+    filter_plateau,
+)
+from analysis.cell_utils import (
+    convert_cell_to_coordinates,
+)
+from analysis.constants import (
     IC0_C3,
     READ_XMAX,
     READ_XMIN,
-    convert_cell_to_coordinates,
-    filter_plateau,
+)
+from analysis.data_processing import (
     get_bit_error_rate,
     get_channel_temperature,
     get_current_cell,
@@ -29,7 +35,7 @@ from plotting.helpers import (
     plot_fill_between_array,
     set_ber_ticks,
 )
-from plotting.style import CMAP, CMAP3, add_errorbar, add_colorbar
+from plotting.style import CMAP, CMAP3, add_colorbar, add_errorbar
 
 
 def plot_read_sweep(
@@ -83,8 +89,7 @@ def plot_read_sweep(
 
     # Add error bars if required
     if show_errorbar:
-        add_ber_error_band(ax, read_currents, value)
-    # Set axis limits and ticks
+        add_errorbar(ax, read_currents, value)
     
     return ax
 

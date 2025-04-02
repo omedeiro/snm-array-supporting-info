@@ -1,3 +1,11 @@
+
+SUBSTRATE_TEMP = 1.3
+CRITICAL_TEMP = 12.3
+READ_XMIN = 400
+READ_XMAX = 1000
+IC0_C3 = 910
+VOLTAGE_THRESHOLD = 2.0e-3
+
 CELLS = {
     "A1": {
         "write_current": 150e-6,

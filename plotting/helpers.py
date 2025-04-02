@@ -5,11 +5,13 @@ from matplotlib.collections import PolyCollection
 from matplotlib.pyplot import Axes
 from matplotlib.ticker import MultipleLocator
 
-from analysis.utils import (
-    get_bit_error_rate,
-    get_enable_current_sweep,
+from analysis.calculations import (
     polygon_inverting,
     polygon_nominal,
+)
+from analysis.data_processing import (
+    get_bit_error_rate,
+    get_enable_current_sweep,
 )
 from plotting.style import CMAP
 

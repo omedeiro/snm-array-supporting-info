@@ -4,7 +4,7 @@ import ltspice
 import numpy as np
 from matplotlib import pyplot as plt
 
-from analysis.utils import (
+from analysis.constants import (
     filter_first,
     import_directory,
     process_read_data,

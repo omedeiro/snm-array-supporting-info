@@ -10,9 +10,7 @@ from cycler import cycler
 from matplotlib.axes import Axes
 from matplotlib.ticker import MultipleLocator
 
-from analysis.utils import (
-    get_enable_read_current,
-)
+from analysis.data_processing import get_enable_read_current
 
 # Color palettes
 CMAP = plt.get_cmap("coolwarm")

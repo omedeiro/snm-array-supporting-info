@@ -2,7 +2,7 @@
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 
-from analysis.utils import (
+from analysis.constants import (
     get_channel_temperature,
     get_enable_read_current,
     import_directory,

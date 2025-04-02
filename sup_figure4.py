@@ -2,7 +2,7 @@ import os
 
 import matplotlib.pyplot as plt
 
-from analysis.utils import import_directory
+from analysis.constants import import_directory
 from plotting.style import apply_snm_style, set_figsize_wide
 from plotting.sweeps import plot_enable_write_sweep_multiple
 
